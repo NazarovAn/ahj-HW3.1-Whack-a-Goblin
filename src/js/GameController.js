@@ -2,14 +2,20 @@ import { toggleHiddenClass } from './utils';
 
 export default class GameController {
   constructor(ui, counter) {
+    this.container = document.getElementById('container');
     this.newGameButton = document.getElementById('new-game');
     this.GameEndButton = document.getElementById('game-end');
     this.ui = ui;
     this.drawEl = ui.drawEl;
     this.fields = ui.fields;
-    this.newInterval = setInterval(() => this.ui.drawElement(this.drawEl), 1000);
+    this.newInterval = 0;
     this.newCounter = counter;
     this.startAgain = () => this.newGame();
+  }
+
+  init() {
+    this.addListners();
+    this.setNewInterval();
   }
 
   addListners() {
@@ -23,6 +29,21 @@ export default class GameController {
         this.checkMisses();
       });
     });
+  }
+
+  setNewInterval() {
+    this.newInterval = setInterval(() => {
+      this.ui.drawElement(this.drawEl);
+      setTimeout(() => this.checkGoblin(), 980);
+    }, 1000);
+  }
+
+  checkGoblin() {
+    if (this.container.querySelector('img') === null) {
+      return;
+    }
+    this.newCounter.increaseMissPoints();
+    this.checkMisses();
   }
 
   findTargetOnField(click, area) {
@@ -48,7 +69,7 @@ export default class GameController {
   }
 
   newGame() {
-    this.newInterval = setInterval(() => this.ui.drawElement(this.drawEl), 1000);
+    this.newInterval = this.setNewInterval();
     this.newCounter.clearCounters();
     toggleHiddenClass(this.newGameButton, this.GameEndButton);
   }
